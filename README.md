@@ -22,9 +22,10 @@ Compute the discrete Fourier transforms (DFT) of the two images that are to be r
 
 Determine the cross-power spectrum of the Fourier transforms of the two images. The formula is:
 
-$ R(u, v) = \frac{F1(u, v) \times F2^*(u, v)}{|F1(u, v) \times F2^*(u, v)|} $
+ $\frac{F1(u, v)\times F2'(u, v)}{|F1(u, v)\times F2'(u, v)|}$
+ 
 
-Here, $F2^*$ represents the complex conjugate of $F2$.
+Here, $F2'$ represents the complex conjugate of $F2$.
 
 #### 3. Inverse Fourier Transform
 
@@ -36,7 +37,7 @@ The location of the peak in this spatial domain indicates the translational shif
 
 ### Rationale
 
-- The **cross-power spectrum** (in step 2) works to eliminate amplitude data, focusing solely on phase differences. The calculation of $F1 \times F2^*$ provides the phase difference for every frequency component. By dividing it by its magnitude, the result is normalized, keeping only phase data.
+- The **cross-power spectrum** (in step 2) works to eliminate amplitude data, focusing solely on phase differences. The calculation of $F1 \times F2'$ provides the phase difference for every frequency component. By dividing it by its magnitude, the result is normalized, keeping only phase data.
 
 - With the inverse Fourier transform (in step 3), spatial shifts appear as peaks. The location of the largest peak equates to the relative shift between the images.
 
