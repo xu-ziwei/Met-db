@@ -22,7 +22,7 @@ Compute the discrete Fourier transforms (DFT) of the two images that are to be r
 
 Determine the cross-power spectrum of the Fourier transforms of the two images. The formula is:
 
-$R(u, v) = \frac{F1(u, v) \times F2^*(u, v)}{|F1(u, v) \times F2^*(u, v)|}$
+$ R(u, v) = \frac{F1(u, v) \times F2^*(u, v)}{|F1(u, v) \times F2^*(u, v)|} $
 
 Here, $F2^*$ represents the complex conjugate of $F2$.
 
