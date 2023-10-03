@@ -129,6 +129,14 @@ CREATE TABLE InstrumentInformation
    PRIMARY KEY (Id)
 );
 
+CREATE TABLE PathStorage (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    job_id INT NOT NULL,
+    local_path VARCHAR(255) NOT NULL,
+    cloud_path VARCHAR(255) NOT NULL,
+    FOREIGN KEY (job_id) REFERENCES Job(id)  -- Assuming the primary key for Job table is 'id'
+);
+
 
 CREATE INDEX IX_OriginalAcquireTask ON AcquireSettings (OriginalAcquireTask_id ASC);
 
