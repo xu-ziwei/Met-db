@@ -16,7 +16,6 @@ CREATE TABLE AcquireSettings
    PRIMARY KEY (Id)
 );
 
-
 CREATE TABLE AcquireTask
 (
    JobTask_id INT NOT NULL,
@@ -30,7 +29,8 @@ CREATE TABLE AcquireTask
    UsedRepetitions INT,
    FirstAvailableRepetition INT DEFAULT 0,
    AcquireSettings_id INT,
-   InstrumentInfo_id INT
+   InstrumentInfo_id INT,
+   PRIMARY KEY (JobTask_id) 
 );
 
 
