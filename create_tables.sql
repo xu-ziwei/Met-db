@@ -116,6 +116,19 @@ CREATE TABLE ScanArea
    PRIMARY KEY (Id)
 );
 
+CREATE TABLE InstrumentInformation
+(
+   Id INT NOT NULL AUTO_INCREMENT,
+   Name VARCHAR(255),
+   IPAddress VARCHAR(255),
+   SerialNumber VARCHAR(255),
+   SoftwareVersion VARCHAR(255),
+   TrayMotorStepSize FLOAT,
+   CameraMotorStepSize FLOAT,
+   FocusMotorStepSize FLOAT,
+   PRIMARY KEY (Id)
+);
+
 
 CREATE INDEX IX_OriginalAcquireTask ON AcquireSettings (OriginalAcquireTask_id ASC);
 
