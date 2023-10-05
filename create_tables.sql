@@ -134,7 +134,6 @@ CREATE TABLE PathStorage (
     job_id INT NOT NULL,
     local_path VARCHAR(255) NOT NULL,
     cloud_path VARCHAR(255) NOT NULL,
-    FOREIGN KEY (job_id) REFERENCES Job(id)  -- Assuming the primary key for Job table is 'id'
 );
 
 
