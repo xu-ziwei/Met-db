@@ -1,5 +1,22 @@
 # Met-db
 
+## change data file structure. Python read data and analyse
+Keep documentation on the schema, the unique identifier assignment, the automation script, create a robust solution to manage the storage and retrieval of your microscopy images. 
+
+* Automation Script
+    - [x] Generates a unique storage path
+    - [x] create tables for MySql on google 
+    - [ ] Uploads the image to Google Cloud Storage.
+        - [x] access to cloud set  
+            - [x] `jason` key for 
+                 `from google.cloud import storage
+                 client=storage.Client.from_service_account_json('<PATH_TO_SERVICE_ACCOUNT_JSON>')`
+    - [x] Inserts a new record in the Google Cloud SQL database
+        - [x] change schema for empty MySql
+        - [x] check datatype when seach `.sdf`
+        - [x] change datatype for insert
+
+
 ### image registration for raw data
 **FFT**
 >Phase Correlation:
