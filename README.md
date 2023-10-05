@@ -1,6 +1,6 @@
 # Met-db
 
-## change data file structure. Python read data and analyse
+## Change data file structure. Python read data and analyse `cloud_up.py`
 Keep documentation on the schema, the unique identifier assignment, the automation script, create a robust solution to manage the storage and retrieval of your microscopy images. 
 
 * Automation Script
@@ -17,7 +17,7 @@ Keep documentation on the schema, the unique identifier assignment, the automati
         - [x] change datatype for insert
 
 
-### image registration for raw data
+## Image registration for raw data
 **FFT**
 >Phase Correlation:
 Peak Detection: When you calculate the phase correlation between two images, the peak of the resulting image represents the translational shift between them. This peak is very distinct and can be detected easily, even in the presence of noise.
