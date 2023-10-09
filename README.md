@@ -16,7 +16,20 @@ Keep documentation on the schema, the unique identifier assignment, the automati
         - [x] check datatype when seach `.sdf`
         - [x] change datatype for insert
 
+## Cloud solution
 
+1. Load configuration from `config.json`
+2. Establish database connections
+3. Fetch data from the SQL CE Job table.
+4. For each job:
+    * Check if it has already been uploaded (using `last_uploaded_id`).
+    * For each local path associated with the job:
+        * If the local path doesn't exist, log a warning and skip.
+        * Otherwise, copy the local file to the cloud, but skip if the file already exists on GCS.
+    * If data was successfully copied to the cloud:
+        * Try to insert the data into the MySQL database.
+        * If a duplicate data entry error occurs, log the error and skip the current job.
+5. Close all database connections and log that the data migration is complete.
 ## Image registration for raw data
 **FFT**
 >Phase Correlation:
