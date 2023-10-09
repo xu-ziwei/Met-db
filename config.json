@@ -1,0 +1,9 @@
+{
+    "db_host": "34.78.59.186",
+    "db_name": "met_db",
+    "db_user": "root",
+    "db_password": "Metsystem",
+    "service_account_file_path": "met-raw-images.json",
+    "bucket_name": "ocelloscope_raw",
+    "data_source": "DataStore.sdf"
+}

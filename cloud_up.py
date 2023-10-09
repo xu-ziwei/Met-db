@@ -3,28 +3,36 @@ import logging
 import adodbapi
 import mysql.connector
 from google.cloud import storage
+import json
+
 
 # LOGGING SETUP
 def setup_logger(filename="migration_log.txt"):
     ''' 
-    Setup a basic logger that writes messages to a file and console.
+    Setup a logger that writes messages to a file and console with enhanced formatting.
     '''
-    import logging
 
     # Setting up logging
     logger = logging.getLogger('migration_logger')
-    logger.setLevel(logging.DEBUG)
+    # If logger has handlers, clear them to prevent duplicate logging
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
+    logger.setLevel(logging.DEBUG)  # Setting the threshold for logger
 
     # File handler for writing logs
-    file_handler = logging.FileHandler(filename)
+    file_handler = logging.FileHandler(filename, mode='a')  # Append mode to prevent overwriting
     file_handler.setLevel(logging.DEBUG)
 
     # Console handler for printing logs
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)
 
-    # Setting format for the log messages
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    # Enhanced format for the log messages with filename, line number, and function
+    formatter = logging.Formatter(
+        '[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d][%(funcName)s] - %(message)s'
+    )
+
     file_handler.setFormatter(formatter)
     console_handler.setFormatter(formatter)
 
@@ -32,6 +40,7 @@ def setup_logger(filename="migration_log.txt"):
     logger.addHandler(console_handler)
 
     return logger
+
 
 
 def get_last_uploaded_job_id(filename='last_uploaded.txt'):
@@ -184,17 +193,50 @@ def copy_to_cloud(local_path, cloud_path, service_account_file_path, bucket_name
                 print(f"File {cloud_file_path} already exists in GCS. Skipping upload.")
 
 
+def download_from_cloud(job_id, service_account_file_path, bucket_name, mysql_cursor):
+    """
+    Download image data from GCS to local path based on job_id.
+
+    job_id: The ID for which data needs to be downloaded.
+    service_account_file_path: Path to GCS service account json file.
+    bucket_name: Name of the GCS bucket from which data will be downloaded.
+    mysql_cursor: Cursor to the MySQL database to query PathStorage table.
+    """
+    
+    # 1. Query the PathStorage table
+    query = "SELECT cloud_path, local_path FROM PathStorage WHERE job_id = %s"
+    mysql_cursor.execute(query, (job_id,))
+    paths = mysql_cursor.fetchall()
+
+    # Initialize GCS client
+    storage_client = storage.Client.from_service_account_json(service_account_file_path)
+    bucket = storage_client.bucket(bucket_name)
+
+    for cloud_path, local_path in paths:
+        # Ensure local directory exists
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+
+        # 2. Download from GCS
+        blob = bucket.blob(cloud_path)
+        blob.download_to_filename(local_path)
+
+    print(f"Images for job_id {job_id} downloaded successfully!")
+
+
 
 def main():
     global mysql_connection
     # Database configs
-    db_host = "34.78.59.186"
-    db_name = "met_db"
-    db_user = "root"
-    db_password = "Metsystem"
-    service_account_file_path = 'met-raw-images.json'
-    bucket_name = "ocelloscope_raw"
-    data_source = "DataStore.sdf"
+    with open("config.json", "r") as file:
+        config = json.load(file)
+    
+    db_host = config["db_host"]
+    db_name = config["db_name"]
+    db_user = config["db_user"]
+    db_password = config["db_password"]
+    service_account_file_path = config["service_account_file_path"]
+    bucket_name = config["bucket_name"]
+    data_source = config["data_source"]
 
     # Create a connection to the database
 
