@@ -193,6 +193,21 @@ def copy_to_cloud(local_path, cloud_path, service_account_file_path, bucket_name
             else:
                 print(f"File {cloud_file_path} already exists in GCS. Skipping upload.")
 
+def uploade96_to_cloud(job_id, local_path, service_account_file_path, bucket_name):
+    """Uploads the file to GCS based on job_id."""
+
+    # Construct the cloud path
+    cloud_path = "e96/" + str(job_id) + "/e96_wells"
+
+    # Initialize GCS client
+    storage_client = storage.Client.from_service_account_json(service_account_file_path)
+    bucket = storage_client.bucket(bucket_name)
+
+    # Upload the file
+    blob = bucket.blob(cloud_path)
+    blob.upload_from_filename(local_path)
+
+    print(f"Uploaded {local_path} to {cloud_path}")
 
 
 def upload_data(mysql_connection, mysql_cursor, sqlce_connection, sqlce_cursor, service_account_file_path, bucket_name, data_source, logger):
@@ -214,8 +229,6 @@ def upload_data(mysql_connection, mysql_cursor, sqlce_connection, sqlce_cursor, 
 
         files_exist = False 
         
-        #ToDo
-        # Here Add function for uploading e96_wells
         
 
         # If local data exists, copy it to the cloud
@@ -231,9 +244,12 @@ def upload_data(mysql_connection, mysql_cursor, sqlce_connection, sqlce_cursor, 
         if not files_exist:
             continue
         
+        local_path_e96 = f'{job_id}/Acquire_0/e96_wells'
+        uploade96_to_cloud(job_id, local_path_e96, service_account_file_path, bucket_name)
         #update the finished job uploading task
         update_last_uploaded_job_id(job_id, filename='last_uploaded.txt')
         
+
         try:
             insert_query = f"INSERT INTO Job VALUES ({', '.join(['%s'] * len(job))})"
             mysql_cursor.execute(insert_query, job)
@@ -287,7 +303,7 @@ def download_from_cloud(job_id, service_account_file_path, bucket_name, mysql_cu
             
             # Ensure the directory structure is present
             os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
-            print(local_file_path)
+            # print("downloading to:", local_file_path)
             # Download the blob to the local file path
             blob.download_to_filename(local_file_path)
         
@@ -296,7 +312,19 @@ def download_from_cloud(job_id, service_account_file_path, bucket_name, mysql_cu
     messagebox.showinfo("Success", f"Data for job_id {job_id} downloaded successfully!")
 
 
-    
+def downloade96_from_cloud(job_id, download_path, service_account_file_path, bucket_name):
+    """Downloads the file from GCS based on job_id."""
+
+    # Construct the cloud path
+    cloud_path = "e96/" + str(job_id) + "/e96_wells"
+
+    # Initialize GCS client
+    storage_client = storage.Client.from_service_account_json(service_account_file_path)
+    bucket = storage_client.bucket(bucket_name)
+
+    # Download the file
+    blob = bucket.blob(cloud_path)
+    blob.download_to_filename(download_path)  
 
 def download_data(mysql_connection, mysql_cursor, service_account_file_path, bucket_name):
 
@@ -325,6 +353,8 @@ def download_data(mysql_connection, mysql_cursor, service_account_file_path, buc
         selected_items = [var.get() for var in checkboxes if var.get()]
         for job_id in selected_items:
             download_from_cloud(job_id, service_account_file_path, bucket_name, mysql_cursor)
+            local_path = f'{job_id}/Acquire_0/e96_wells'
+            downloade96_from_cloud(job_id, local_path, service_account_file_path, bucket_name)
 
     app = tk.Tk()
     app.title('Data Download UI')
