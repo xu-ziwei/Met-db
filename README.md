@@ -1,12 +1,12 @@
 # Met-db
 
-## Change data file structure. Python read data and analyse `cloud_up.py`
+## Change data file structure. Python read data and analyse `cloud.py`
 Keep documentation on the schema, the unique identifier assignment, the automation script, create a robust solution to manage the storage and retrieval of your microscopy images. 
 
 * Automation Script
     - [x] Generates a unique storage path
     - [x] create tables for MySql on google 
-    - [ ] Uploads the image to Google Cloud Storage.
+    - [x] Uploads the image to Google Cloud Storage.
         - [x] access to cloud set  
             - [x] `jason` key for 
                  `from google.cloud import storage
