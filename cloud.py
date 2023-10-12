@@ -213,6 +213,10 @@ def upload_data(mysql_connection, mysql_cursor, sqlce_connection, sqlce_cursor, 
         local_paths, cloud_paths = generate_paths(sqlce_cursor, job_id, job[1])
 
         files_exist = False 
+        
+        #ToDo
+        # Here Add function for uploading e96_wells
+        
 
         # If local data exists, copy it to the cloud
         for local_path, cloud_path in zip(local_paths, cloud_paths):
@@ -226,7 +230,10 @@ def upload_data(mysql_connection, mysql_cursor, sqlce_connection, sqlce_cursor, 
 
         if not files_exist:
             continue
-
+        
+        #update the finished job uploading task
+        update_last_uploaded_job_id(job_id, filename='last_uploaded.txt')
+        
         try:
             insert_query = f"INSERT INTO Job VALUES ({', '.join(['%s'] * len(job))})"
             mysql_cursor.execute(insert_query, job)
@@ -240,6 +247,9 @@ def upload_data(mysql_connection, mysql_cursor, sqlce_connection, sqlce_cursor, 
             insert_data_into_mysql(sqlce_cursor, mysql_cursor, "AcquireSettings", "OriginalAcquireTask_id", job_id)
             insert_data_into_mysql(sqlce_cursor, mysql_cursor, "InstrumentInformation", "Id", job_id)
             insert_data_into_mysql(sqlce_cursor, mysql_cursor, "ScanArea", "AcquireSettings_id", job_id)
+            
+            #ToDo
+            #add insert data to scan table
 
         except mysql.connector.IntegrityError as ie:
             logger.error(f"Error inserting data for Job ID {job_id}: {ie}")
