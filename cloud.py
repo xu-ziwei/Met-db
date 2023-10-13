@@ -246,6 +246,9 @@ def upload_data(mysql_connection, mysql_cursor, sqlce_connection, sqlce_cursor, 
         
         local_path_e96 = f'{job_id}/Acquire_0/e96_wells'
         uploade96_to_cloud(job_id, local_path_e96, service_account_file_path, bucket_name)
+
+        #upload sdf?
+
         #update the finished job uploading task
         update_last_uploaded_job_id(job_id, filename='last_uploaded.txt')
         
@@ -273,7 +276,7 @@ def upload_data(mysql_connection, mysql_cursor, sqlce_connection, sqlce_cursor, 
 
 
 
-def download_from_cloud(job_id, service_account_file_path, bucket_name, mysql_cursor):
+def download_from_cloud(job_id, service_account_file_path, bucket_name, mysql_cursor, logger):
     """
     Download entire job data from GCS to local path based on job_id.
 
@@ -305,8 +308,11 @@ def download_from_cloud(job_id, service_account_file_path, bucket_name, mysql_cu
             os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
             # print("downloading to:", local_file_path)
             # Download the blob to the local file path
-            blob.download_to_filename(local_file_path)
-        
+            if not os.path.exists(local_file_path):
+                blob.download_to_filename(local_file_path)
+            else:
+                logger.info(f"File {local_file_path} already exists. Skipping download.")
+
 
     # Notify user of completion
     messagebox.showinfo("Success", f"Data for job_id {job_id} downloaded successfully!")
@@ -326,7 +332,7 @@ def downloade96_from_cloud(job_id, download_path, service_account_file_path, buc
     blob = bucket.blob(cloud_path)
     blob.download_to_filename(download_path)  
 
-def download_data(mysql_connection, mysql_cursor, service_account_file_path, bucket_name):
+def download_data(mysql_connection, mysql_cursor, service_account_file_path, bucket_name, logger):
 
     def fetch_filtered_data(search_term=""):
         """Fetches data filtered by the search term."""
@@ -352,7 +358,7 @@ def download_data(mysql_connection, mysql_cursor, service_account_file_path, buc
     def download_selected():
         selected_items = [var.get() for var in checkboxes if var.get()]
         for job_id in selected_items:
-            download_from_cloud(job_id, service_account_file_path, bucket_name, mysql_cursor)
+            download_from_cloud(job_id, service_account_file_path, bucket_name, mysql_cursor, logger)
             local_path = f'{job_id}/Acquire_0/e96_wells'
             downloade96_from_cloud(job_id, local_path, service_account_file_path, bucket_name)
 
@@ -436,7 +442,7 @@ def main():
         if args.mode == "upload":
             upload_data(mysql_connection, mysql_cursor, sqlce_connection, sqlce_cursor, service_account_file_path, bucket_name, data_source, logger)
         elif args.mode == "download":
-            download_data(mysql_connection, mysql_cursor, service_account_file_path, bucket_name)
+            download_data(mysql_connection, mysql_cursor, service_account_file_path, bucket_name, logger)
 
 
     except Exception as e:
